@@ -1,7 +1,26 @@
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
+library(rvest)
 
-covid19 <- read.csv("https://www.arcgis.com/sharing/rest/content/items/f10774f1c63e40168479a1feb6c7ca74/data")
+if (file.exists("current_state.txt")){
+  current_state <- read_file("current_state.txt")
+}else{
+  current_state <- ""
+}
+
+html <- read_html("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0")%>%html_node(".restBody")%>%html_text
+if (current_state != html){
+  print("data set has changed and will be reloaded")
+  covid19 <- read.csv("https://www.arcgis.com/sharing/rest/content/items/f10774f1c63e40168479a1feb6c7ca74/data")
+  write.csv(covid19, file = "RKI_COVID19.csv")
+  current_state <- html%>%html_node(".restBody")%>%html_text
+  write(current_state, file="current_state.txt")
+}else{
+  print("loading local dataset")
+  covid19 <- read.csv("RKI_COVID19.csv")
+}
+
+
+
 
 cases_Bundesland <- covid19 %>% 
   group_by(Meldedatum,Bundesland) %>% 
@@ -58,6 +77,8 @@ plot_new_deaths_age_group <- function(group){
     ggtitle("Todesfälle in der Altersgruppe", group) +
     geom_line()
 }
+
+
 
 #' Plots the new cases in a given regency.
 #' @param pRegency A string
