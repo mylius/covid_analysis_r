@@ -1,0 +1,11 @@
+Package: Covid19Analysis
+Type: Package
+Title: Analyses the RKI's covid-19 data
+Version: 0.1.0
+Author: Anne, Jan-Gabriel, Moni, Yvonne
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true

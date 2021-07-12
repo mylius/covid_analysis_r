@@ -1,0 +1,29 @@
+
+Name: RKI_COVID19Display Field: Type: TableDescription: Copyright Text: Max Record Count: 25000Supported query Formats: JSONUse Standardized Queries: TrueHasZ: falseHasM: falseHas Attachments: falseHas Geometry Properties: falseHTML Popup Type: esriServerHTMLPopupTypeNoneObject ID Field: ObjectIdUnique ID Field: 
+Name : ObjectId
+IsSystemMaintained : TrueGlobal ID Field: Type ID Field: Fields:
+IdBundesland (type: esriFieldTypeInteger, alias: IdBundesland, SQL Type: sqlTypeInteger, nullable: true, editable: true)
+  Bundesland (type: esriFieldTypeString, alias: Bundesland, SQL Type: sqlTypeNVarchar, length: 2147483647, nullable: true, editable: true)
+  Landkreis (type: esriFieldTypeString, alias: Landkreis, SQL Type: sqlTypeNVarchar, length: 2147483647, nullable: true, editable: true)
+  Altersgruppe (type: esriFieldTypeString, alias: Altersgruppe, SQL Type: sqlTypeNVarchar, length: 2147483647, nullable: true, editable: true)
+  Geschlecht (type: esriFieldTypeString, alias: Geschlecht, SQL Type: sqlTypeNVarchar, length: 2147483647, nullable: true, editable: true)
+  AnzahlFall (type: esriFieldTypeInteger, alias: AnzahlFall, SQL Type: sqlTypeInteger, nullable: true, editable: true)
+  AnzahlTodesfall (type: esriFieldTypeInteger, alias: AnzahlTodesfall, SQL Type: sqlTypeInteger, nullable: true, editable: true)
+  ObjectId (type: esriFieldTypeOID, alias: ObjectId, SQL Type: sqlTypeInteger, length: 0, nullable: false, editable: false)
+  Meldedatum (type: esriFieldTypeDate, alias: Meldedatum, SQL Type: sqlTypeOther, length: 0, nullable: true, editable: true)
+  IdLandkreis (type: esriFieldTypeString, alias: Landkreis ID, SQL Type: sqlTypeOther, length: 256, nullable: true, editable: true)
+  Datenstand (type: esriFieldTypeString, alias: Datenstand, SQL Type: sqlTypeOther, length: 256, nullable: true, editable: true)
+  NeuerFall (type: esriFieldTypeInteger, alias: Neuer Fall, SQL Type: sqlTypeOther, nullable: true, editable: true)
+  NeuerTodesfall (type: esriFieldTypeInteger, alias: Neuer Todesfall, SQL Type: sqlTypeOther, nullable: true, editable: true)
+  Refdatum (type: esriFieldTypeDate, alias: Referenzdatum, SQL Type: sqlTypeOther, length: 0, nullable: true, editable: true)
+  NeuGenesen (type: esriFieldTypeInteger, alias: Neu Genesen, SQL Type: sqlTypeOther, nullable: true, editable: true)
+  AnzahlGenesen (type: esriFieldTypeInteger, alias: Anzahl Genesen, SQL Type: sqlTypeOther, nullable: true, editable: true)
+  IstErkrankungsbeginn (type: esriFieldTypeInteger, alias: IstErkrankungsbeginn, SQL Type: sqlTypeOther, nullable: true, editable: true)
+  Altersgruppe2 (type: esriFieldTypeString, alias: Altersgruppe 2, SQL Type: sqlTypeOther, length: 256, nullable: true, editable: true)
+Is Data Versioned: falseHas Contingent Values: falseSupports Rollback On Failure Parameter: trueLast Edit Date: 7/11/2021 1:40:14 AMSupported Operations: 
+  Query
+  Query Top Features
+  Query Analytic
+  Generate Renderer
+  Validate SQL
+
