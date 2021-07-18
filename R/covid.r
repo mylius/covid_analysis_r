@@ -1,7 +1,8 @@
 library(tidyverse)
 library(rvest)
-library(dict)
+library(Dict)
 library(collections)
+library(padr)
 
 reload <- FALSE
 
@@ -58,7 +59,7 @@ get_Bundesland <- function(pLand,category="cases"){
                              filter(Bundesland == pLand),date)
   result <- unique(result %>% ungroup() %>%
     select(date,as.name(category)))
-  return(result)
+  return(pad(as_tibble(result)))
 }
 
 #' Returns the values over time for a given age group in a given category.
@@ -73,7 +74,7 @@ get_Altersgruppe <- function(group,category="cases"){
                              filter(Altersgruppe == group),date)
   result <- unique(result %>% ungroup() %>%
     select(date,as.name(category)))
-  return(result)
+  return(pad(as_tibble(result)))
 }
 
 #' Returns the values over time for a given regency in a given category.
@@ -88,7 +89,7 @@ get_Landkreis <- function(pRegency,category="cases"){
                              filter(Landkreis == pRegency),date)
   result <- unique(result %>% ungroup() %>%
     select(date,as.name(category)))
-  return(result)
+  return(pad(as_tibble(result)))
 }
 
 
@@ -184,14 +185,56 @@ plot_deaths_mav_regency <- function(pLand,window_size=7){
   plot1
 }
 
+#' Returns maximal correlation between two time series and the lag at which it is reached.
+#' @param time_series_0 A list
+#' @param time_series_1 A list
+#' @example
+#' get_ccf(get_Bundesland("Berlin"),get_Bundesland("Mecklenburg-Vorpommern"))
+get_ccf <- function(time_series_0,time_series_1){
+  results <- ccf(time_series_0$cases,time_series_1$cases,type="correlation",pl=TRUE)
+  print(results)
+  max_cor <- results[which.max(head(unlist(results,use.names=TRUE),49))-25]
+  return(c(max_cor$acf,max_cor$lag))
+}
 
-land_cases = get_timeseries("Bundesland","cases")
-land_deaths = get_timeseries("Bundesland","deaths")
-group_cases = get_timeseries("Altersgruppe","cases")
-group_deaths = get_timeseries("Altersgruppe","deaths")
-regency_cases = get_timeseries("Landkreis","cases")
-regency_deaths =get_timeseries("Landkreis","deaths")
+#' Returns the fallsterblichkeit (deaths/cases) for a given item and grouping.
+#' @param item A String
+#' @param grouping A string
+#' @example
+#' get_fallsterblichkeit("Hamburg","Bundesland")
+get_fallsterblickeit <- function(item,grouping){
+  function_name <- paste("get_",grouping,sep="")
+  deaths <- pad(as_tibble(get(function_name)(item,"deaths")))
+  cases <- pad(as_tibble(get(function_name)(item,"cases")))
+  result <- data.frame(date=cases[1],test=c(deaths[-1]/cases[-1]))
+  return(result)
+}
 
+get_ccf(get_Bundesland("Berlin"),get_Bundesland("Mecklenburg-Vorpommern"))
+
+get_fallsterblickeit("Hamburg","Bundesland")
+
+if (reload && file.exists("land_cases.rdata") && file.exists("land_deaths.rdata") && file.exists("group_cases.rdata") && file.exists("group_deaths.rdata") && file.exists("regency_cases.rdata") && file.exists("regency_deaths.rdata")){
+  land_cases = load("land_cases.rdata")
+  land_deaths = load("land_deaths.rdata")
+  group_cases = load("group_cases.rdata")
+  group_deaths = load("group_deaths.rdata")
+  regency_cases = load("regency_cases.rdata")
+  regency_deaths = load("regency_deaths.rdata")
+}else{
+  land_cases = get_timeseries("Bundesland","cases")
+  save(land_cases,"land_cases.rdata")
+  land_deaths = get_timeseries("Bundesland","deaths")
+  save(land_deaths,"land_deaths.rdata")
+  group_cases = get_timeseries("Altersgruppe","cases")
+  save(group_cases,"group_cases.rdata")
+  group_deaths = get_timeseries("Altersgruppe","deaths")
+  save(group_deaths,"group_deaths.rdata")
+  regency_cases = get_timeseries("Landkreis","cases")
+  save(regency_cases,"regency_cases.rdata")
+  regency_deaths =get_timeseries("Landkreis","deaths")
+  save(regency_deaths,"regency_deaths.rdata")
+}
 
 plot_cases_mav_land("Hamburg")
 plot_deaths_mav_land("Hamburg")
@@ -199,3 +242,21 @@ plot_cases_mav_agegroup("Hamburg")
 plot_deaths_mav_agegroup("Hamburg")
 plot_cases_mav_regency("Hamburg")
 plot_deaths_mav_regency("Hamburg")
+
+
+get_covid_per_month <- function(){
+  sum_anzahlFaelle <- summarize(covid19,sum = sum(AnzahlFall))$sum
+  sum_anzahlEDB <- summarize(covid19,sum = sum(AnzahlFall[IstErkrankungsbeginn==1]))$sum
+  AnteilEDB <- sum_anzahlEDB / sum_anzahlFaelle * 100
+  covid19$MeldedatumPerMonth <- format(as.Date(covid19$Meldedatum), "%Y-%m")
+  covid19PerMonth <- covid19 %>% select(MeldedatumPerMonth,IstErkrankungsbeginn, AnzahlFall)  %>%
+    group_by(MeldedatumPerMonth) %>%
+    summarize(sumPerMonthTotal = sum(AnzahlFall),
+              sumPerMonthBekannt = sum(AnzahlFall[IstErkrankungsbeginn==1]))
+  covid19PerMonth <- covid19PerMonth %>% mutate(AnteilPerMonth = sumPerMonthBekannt / sumPerMonthTotal * 100) %>%
+    mutate(TotalAnteilPerMonth = sumPerMonthTotal / sum_anzahlFaelle * 100) %>%
+    mutate(TotalBekanntAnteilPerMonth = sumPerMonthBekannt / sum_anzahlEDB * 100)
+  return(covid19PerMonth)
+}
+
+print(get_covid_per_month())
